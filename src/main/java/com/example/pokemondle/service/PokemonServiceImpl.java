@@ -24,7 +24,7 @@ public class PokemonServiceImpl implements PokemonService {
     public PokemonServiceImpl(PokemonRepository pokemonRepository) {
         this.pokemonRepository = pokemonRepository;
         this.pokemonList = findAll();
-        this.randomPokemon = getRandomPokemon();
+        this.randomPokemon = pokemonRepository.findByName("Charizard");
 
     }
 
@@ -101,7 +101,8 @@ public class PokemonServiceImpl implements PokemonService {
     @Override
     public Feedback compare(String pokemonName) {
 
-        Pokemon pokemon = splitOnThreads(pokemonName);
+        //Pokemon pokemon = splitOnThreads(pokemonName);
+        Pokemon pokemon = pokemonRepository.findByName(pokemonName);
         if (pokemon == null) {
             return null;
         }
@@ -120,21 +121,21 @@ public class PokemonServiceImpl implements PokemonService {
 
             if (this.randomPokemon.getGeneration() == pokemon.getGeneration())
                 feedback.setCheckGeneration(Answer.Equal);
-            else if (pokemon.getGeneration() < this.randomPokemon.getGeneration()) {
+            else if (pokemon.getGeneration() > this.randomPokemon.getGeneration()) {
                 feedback.setCheckGeneration(Answer.Lower);
-            } else if (pokemon.getGeneration() > this.randomPokemon.getGeneration()) {
+            } else if (pokemon.getGeneration() < this.randomPokemon.getGeneration()) {
                 feedback.setCheckGeneration(Answer.Greater);
             }
             if (this.randomPokemon.getHeight() == pokemon.getHeight()) feedback.setCheckHeight(Answer.Equal);
-            else if (pokemon.getHeight() < this.randomPokemon.getHeight()) {
+            else if (pokemon.getHeight() > this.randomPokemon.getHeight()) {
                 feedback.setCheckHeight(Answer.Lower);
-            } else if (pokemon.getHeight() > this.randomPokemon.getHeight()) {
+            } else if (pokemon.getHeight() < this.randomPokemon.getHeight()) {
                 feedback.setCheckHeight(Answer.Greater);
             }
             if (this.randomPokemon.getWeight() == pokemon.getWeight()) feedback.setCheckWeight(Answer.Equal);
-            else if (pokemon.getWeight() < this.randomPokemon.getWeight()) {
+            else if (pokemon.getWeight() > this.randomPokemon.getWeight()) {
                 feedback.setCheckWeight(Answer.Lower);
-            } else if (pokemon.getWeight() > this.randomPokemon.getWeight()) {
+            } else if (pokemon.getWeight() < this.randomPokemon.getWeight()) {
                 feedback.setCheckWeight(Answer.Greater);
             }
         }
