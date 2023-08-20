@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Struct;
+
 
 @Entity
 @Table(name="Pokemon")
@@ -14,25 +16,25 @@ public class Pokemon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
-    private Long Id;
+    private long id;
 
     @Column(name="name")
-    private String Name;
+    private String name;
 
     @Column(name="generation")
-    private Integer Generation;
+    private int generation;
 
     @Column(name="type1")
-    private PokemonType Type1;
+    private String type1;
 
     @Column(name="type2")
-    private PokemonType Type2;
+    private String type2;
 
     @Column(name="height")
-    private Float Height;
+    private Float height;
 
     @Column(name="weight")
-    private Float Weight;
+    private Float weight;
 
     @Override
     public boolean equals(Object o) {
@@ -41,11 +43,11 @@ public class Pokemon {
 
         Pokemon pokemon = (Pokemon) o;
 
-        return Name.equals(pokemon.Name);
+        return name.equals(pokemon.name);
     }
 
     @Override
     public int hashCode() {
-        return Name.hashCode();
+        return name.hashCode();
     }
 }

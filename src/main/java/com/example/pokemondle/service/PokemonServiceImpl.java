@@ -23,23 +23,24 @@ public class PokemonServiceImpl implements PokemonService {
 
     public PokemonServiceImpl(PokemonRepository pokemonRepository) {
         this.pokemonRepository = pokemonRepository;
-        this.pokemonList = new ArrayList<>();
+        this.pokemonList = findAll();
+        this.randomPokemon = getRandomPokemon();
 
     }
 
     @Override
-    public Optional<Pokemon> findById(Long Id) {
-        return pokemonRepository.findById(Id);
+    public Optional<Pokemon> findById(Long id) {
+        return pokemonRepository.findById(id);
     }
 
     @Override
-    public Pokemon findByName(String Name) {
-        return pokemonRepository.findByName(Name);
+    public Pokemon findByName(String name) {
+        return pokemonRepository.findByName(name);
     }
 
     @Override
     public List<Pokemon> findAll() {    //wywołanie po stronie frontu
-        return this.pokemonList = pokemonRepository.findAll();
+        return pokemonRepository.findAll();
     }
 
     @Override
@@ -47,10 +48,16 @@ public class PokemonServiceImpl implements PokemonService {
         Random random = new Random();
         int randomIdx = random.nextInt(pokemonList.size());
 
-        return this.randomPokemon = pokemonList.get(randomIdx);
+        return pokemonList.get(randomIdx);
     }
 
     public List<List<Pokemon>> splitIntoSublists(List<Pokemon> inputList, int sublistSize) {
+        if (inputList.size() <= sublistSize) {
+            List<List<Pokemon>> singleList = new ArrayList<>();
+            singleList.add(inputList);
+            return singleList;
+        }
+
         List<List<Pokemon>> sublists = new ArrayList<>();
         for (int i = 0; i < inputList.size(); i += sublistSize) {
             int endIndex = Math.min(i + sublistSize, inputList.size());
@@ -58,6 +65,7 @@ public class PokemonServiceImpl implements PokemonService {
         }
         return sublists;
     }
+
 
     @Override
     public Pokemon splitOnThreads(String name) {
