@@ -8,32 +8,32 @@ import java.sql.Struct;
 
 
 @Entity
-@Table(name="Pokemon")
+@Table(name = "Pokemon")
 @Getter
 @Setter
 public class Pokemon {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name = "id")
     private long id;
 
-    @Column(name="name")
+    @Column(name = "name")
     private String name;
 
-    @Column(name="generation")
+    @Column(name = "generation")
     private int generation;
 
-    @Column(name="type1")
+    @Column(name = "type1")
     private String type1;
 
-    @Column(name="type2")
+    @Column(name = "type2")
     private String type2;
 
-    @Column(name="height")
+    @Column(name = "height")
     private Float height;
 
-    @Column(name="weight")
+    @Column(name = "weight")
     private Float weight;
 
     @Override
@@ -49,5 +49,9 @@ public class Pokemon {
     @Override
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public String getType2() {
+        return type2 != null ? type2 : "";
     }
 }

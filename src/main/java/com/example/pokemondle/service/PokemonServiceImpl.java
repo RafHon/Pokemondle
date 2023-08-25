@@ -4,6 +4,8 @@ import com.example.pokemondle.dao.PokemonRepository;
 import com.example.pokemondle.model.Answer;
 import com.example.pokemondle.model.Feedback;
 import com.example.pokemondle.model.Pokemon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,21 +13,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 
 @Service
 public class PokemonServiceImpl implements PokemonService {
 
     List<Pokemon> pokemonList;
     Pokemon randomPokemon;
-
-
     private final PokemonRepository pokemonRepository;
+    private static final Logger logger = LoggerFactory.getLogger(PokemonService.class);
 
     public PokemonServiceImpl(PokemonRepository pokemonRepository) {
         this.pokemonRepository = pokemonRepository;
         this.pokemonList = findAll();
         this.randomPokemon = getRandomPokemon();
-
     }
 
     @Override
@@ -45,7 +47,9 @@ public class PokemonServiceImpl implements PokemonService {
 
         return pokemonList.get(randomIdx);
     }
+
     public Pokemon findByName(String name) {
+        logger.info("Searching for Pokemon with name: {}", name);
         List<Pokemon> allPokemons = pokemonRepository.findAll();
 
         int numThreads = Runtime.getRuntime().availableProcessors(); // Ilość dostępnych procesorów
@@ -56,34 +60,29 @@ public class PokemonServiceImpl implements PokemonService {
         // Podziel listę na podlisty
         List<List<Pokemon>> subLists = partitionList(allPokemons, numThreads);
 
+        AtomicBoolean shutdownFlag = new AtomicBoolean(false);
+
         for (List<Pokemon> subList : subLists) {
-            Future<Pokemon> future = executorService.submit(() -> {
-                for (Pokemon pokemon : subList) {
-                    if (pokemon.getName().equalsIgnoreCase(name)) {
-                        return pokemon;
-                    }
-                }
-                return null;
-            });
+            PokemonFinder pokemonFinder = new PokemonFinder(subList, name, logger, shutdownFlag);
+            Future<Pokemon> future = executorService.submit(pokemonFinder);
             futures.add(future);
         }
-
         executorService.shutdown();
 
         try {
             for (Future<Pokemon> future : futures) {
-                Pokemon foundPokemon = future.get();
-                if (foundPokemon != null) {
-                    executorService.shutdownNow(); // Przerwij pozostałe wątki
-                    return foundPokemon;
+                Pokemon pokemon = future.get();
+                if (pokemon != null) {
+                    return pokemon;
                 }
             }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
-        return null; // Pokemon o podanym imieniu nie został znaleziony
+        return null; // Zwraca null, jeśli nie znaleziono pasującego pokemona
     }
+
 
     private List<List<Pokemon>> partitionList(List<Pokemon> pokemons, int numPartitions) {
         List<List<Pokemon>> partitions = new ArrayList<>();
