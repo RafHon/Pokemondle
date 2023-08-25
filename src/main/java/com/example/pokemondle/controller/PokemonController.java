@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @CrossOrigin("http://localhost:4200")
 @RestController
@@ -29,9 +31,10 @@ public class PokemonController {
         return pokemonService.findByName(name);
     }
 
-    @GetMapping("/{name}/feedback")
-    public Feedback getFeedback(@PathVariable String name) {
-        return (pokemonService.compare(name));
+    @GetMapping("/feedback/{name}")
+    public Feedback getFeedback(@PathVariable String name){
+        return pokemonService.compare(name);
     }
+
 
 }

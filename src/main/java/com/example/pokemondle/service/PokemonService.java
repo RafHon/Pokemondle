@@ -5,6 +5,7 @@ import com.example.pokemondle.model.Pokemon;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 
 public interface PokemonService {
 
@@ -12,7 +13,6 @@ public interface PokemonService {
     Pokemon findByName(String Name);
     List<Pokemon> findAll();
     Pokemon getRandomPokemon();
-    Pokemon splitOnThreads(String name);
     Feedback compare(String pokemonName);
 
 }

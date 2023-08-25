@@ -24,18 +24,13 @@ public class PokemonServiceImpl implements PokemonService {
     public PokemonServiceImpl(PokemonRepository pokemonRepository) {
         this.pokemonRepository = pokemonRepository;
         this.pokemonList = findAll();
-        this.randomPokemon = pokemonRepository.findByName("Charizard");
+        this.randomPokemon = getRandomPokemon();
 
     }
 
     @Override
     public Optional<Pokemon> findById(Long id) {
         return pokemonRepository.findById(id);
-    }
-
-    @Override
-    public Pokemon findByName(String name) {
-        return pokemonRepository.findByName(name);
     }
 
     @Override
@@ -50,59 +45,60 @@ public class PokemonServiceImpl implements PokemonService {
 
         return pokemonList.get(randomIdx);
     }
+    public Pokemon findByName(String name) {
+        List<Pokemon> allPokemons = pokemonRepository.findAll();
 
-    public List<List<Pokemon>> splitIntoSublists(List<Pokemon> inputList, int sublistSize) {
-        if (inputList.size() <= sublistSize) {
-            List<List<Pokemon>> singleList = new ArrayList<>();
-            singleList.add(inputList);
-            return singleList;
+        int numThreads = Runtime.getRuntime().availableProcessors(); // Ilość dostępnych procesorów
+        ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
+
+        List<Future<Pokemon>> futures = new ArrayList<>();
+
+        // Podziel listę na podlisty
+        List<List<Pokemon>> subLists = partitionList(allPokemons, numThreads);
+
+        for (List<Pokemon> subList : subLists) {
+            Future<Pokemon> future = executorService.submit(() -> {
+                for (Pokemon pokemon : subList) {
+                    if (pokemon.getName().equalsIgnoreCase(name)) {
+                        return pokemon;
+                    }
+                }
+                return null;
+            });
+            futures.add(future);
         }
 
-        List<List<Pokemon>> sublists = new ArrayList<>();
-        for (int i = 0; i < inputList.size(); i += sublistSize) {
-            int endIndex = Math.min(i + sublistSize, inputList.size());
-            sublists.add(inputList.subList(i, endIndex));
-        }
-        return sublists;
-    }
-
-
-    @Override
-    public Pokemon splitOnThreads(String name) {
-        List<List<Pokemon>> sublists = splitIntoSublists(this.pokemonList, 100);
-
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-
-        List<Callable<Pokemon>> tasks = new ArrayList<>();
-
-        for (List<Pokemon> list : sublists) {
-            tasks.add(new ComparisonThread(list, name));
-        }
-        Pokemon result = null;
+        executorService.shutdown();
 
         try {
-            List<Future<Pokemon>> futures = executor.invokeAll(tasks);
             for (Future<Pokemon> future : futures) {
-                if (future.get() != null) {
-                    result = future.get();
+                Pokemon foundPokemon = future.get();
+                if (foundPokemon != null) {
+                    executorService.shutdownNow(); // Przerwij pozostałe wątki
+                    return foundPokemon;
                 }
             }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        } finally {
-            executor.shutdown();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
-        return result;
 
+        return null; // Pokemon o podanym imieniu nie został znaleziony
+    }
+
+    private List<List<Pokemon>> partitionList(List<Pokemon> pokemons, int numPartitions) {
+        List<List<Pokemon>> partitions = new ArrayList<>();
+        int partitionSize = (int) Math.ceil((double) pokemons.size() / numPartitions);
+        for (int i = 0; i < pokemons.size(); i += partitionSize) {
+            partitions.add(pokemons.subList(i, Math.min(i + partitionSize, pokemons.size())));
+        }
+        return partitions;
     }
 
     @Override
     public Feedback compare(String pokemonName) {
 
-        //Pokemon pokemon = splitOnThreads(pokemonName);
-        Pokemon pokemon = pokemonRepository.findByName(pokemonName);
+        Pokemon pokemon = findByName(pokemonName);
+        //Pokemon pokemon = pokemonRepository.findByName(pokemonName);
         if (pokemon == null) {
             return null;
         }
