@@ -6,11 +6,11 @@ import com.example.pokemondle.service.PokemonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@CrossOrigin("http://localhost:4200")
 @RestController
 @RequestMapping("/api/pokemondle")
 public class PokemonController {
@@ -32,9 +32,13 @@ public class PokemonController {
     }
 
     @GetMapping("/feedback/{name}")
-    public Feedback getFeedback(@PathVariable String name){
+    public Feedback getFeedback(@PathVariable String name) {
         return pokemonService.compare(name);
     }
 
+    @GetMapping("/all")
+    public List<Pokemon> getAll() {
+        return pokemonService.findAll();
+    }
 
 }
