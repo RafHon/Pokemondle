@@ -1,0 +1,58 @@
+<div class="content">
+  <div class="baner">
+    <div class="logo">
+      <img width=8% src="assets\logo.png">
+    </div>
+    <img width=20% class="stylish-text" src="assets\pokemondle.png">
+    <input #myInput type="text" class="form-control stylish-input" placeholder="Co to za pokemon...?" (keyup.enter)="search(myInput.value)" />
+    <button (click)="search(myInput.value)" class="btn btn-info search stylish-button"><b>Zgaduj</b></button>
+  </div>
+
+  <div class="game">
+    <table class="table table-bordered table-dark">
+      <tr>
+        <td>Nazwa</td>
+        <td>Generacja</td>
+        <td>Typ 1</td>
+        <td>Typ 2</td>
+        <td>Wzrost</td>
+        <td>Waga</td>
+      </tr>
+      <tr *ngFor="let result of searchResults; let i = index">
+        <td>
+          {{searchinputs.at(i) }}
+        </td>
+        <td>
+          <ng-container *ngIf="result.checkGeneration === enum.Equal; else notEqual" class="green-mark">✅</ng-container>
+          <ng-template #notEqual>
+            <ng-container *ngIf="result.checkGeneration === enum.Greater">🔼</ng-container>
+            <ng-container *ngIf="result.checkGeneration === enum.Lower">🔽</ng-container>
+          </ng-template>
+        </td>
+        <td>
+          <ng-container *ngIf="result.checkType1; else notChecked" class="green-mark">✅</ng-container>
+          <ng-template #notChecked>❌</ng-template>
+        </td>
+        <td>
+          <ng-container *ngIf="result.checkType2; else notChecked" class="green-mark">✅</ng-container>
+          <ng-template #notChecked>❌</ng-template>
+        </td>
+        <td>
+          <ng-container *ngIf="result.checkHeight === enum.Equal; else notEqual" class="green-mark">✅</ng-container>
+          <ng-container *ngIf="result.checkHeight === enum.Greater">🔼</ng-container>
+          <ng-container *ngIf="result.checkHeight === enum.Lower">🔽</ng-container>
+        </td>
+        <td>
+          <ng-container *ngIf="result.checkWeight === enum.Equal;" class="green-mark">✅</ng-container>
+          <ng-container *ngIf="result.checkWeight === enum.Greater">🔼</ng-container>
+          <ng-container *ngIf="result.checkWeight === enum.Lower">🔽</ng-container>
+        </td>
+      </tr>
+      <tr *ngIf="myInput.value == randomPokemon!.name">
+        <td colspan="6">
+          <h1>{{myInput.value}} - Wygrana!</h1>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
