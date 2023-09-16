@@ -44,10 +44,14 @@ public class PokemonServiceImpl implements PokemonService {
     public Pokemon getRandomPokemon() {
         Random random = new Random();
         int randomIdx = random.nextInt(pokemonList.size());
-
-        return pokemonList.get(randomIdx);
+        this.randomPokemon = pokemonList.get(randomIdx);
+        return this.randomPokemon;
     }
 
+    @Override
+    public Pokemon readRandomPokemon() {
+        return randomPokemon;
+    }
     public Pokemon findByName(String name) {
         logger.info("Searching for Pokemon with name: {}", name);
         List<Pokemon> allPokemons = pokemonRepository.findAll();

@@ -22,7 +22,7 @@ public class PokemonController {
     }
 
     @GetMapping("/id/{id}")
-    public Optional<Pokemon> getByName(@PathVariable Long id) {
+    public Optional<Pokemon> getById(@PathVariable Long id) {
         return pokemonService.findById(id);
     }
 
@@ -41,4 +41,13 @@ public class PokemonController {
         return pokemonService.findAll();
     }
 
+    @GetMapping("/random")
+    public Pokemon getRandom(){
+        return pokemonService.getRandomPokemon();
+    }
+
+    @GetMapping("/read")
+    public Pokemon readRandomPokemon(){
+        return pokemonService.readRandomPokemon();
+    }
 }

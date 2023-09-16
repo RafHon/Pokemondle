@@ -14,6 +14,7 @@ public interface PokemonService {
     List<Pokemon> findAll();
     Pokemon getRandomPokemon();
     Feedback compare(String pokemonName);
+    Pokemon readRandomPokemon();
 
 }
 
