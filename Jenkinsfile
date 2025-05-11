@@ -4,17 +4,29 @@ pipeline {
     stages {
         stage('Install') {
             steps {
-                bat 'npm install'
+                script {
+                    docker.image('node:18').inside {
+                        sh 'npm install'
+                    }
+                }
             }
         }
         stage('Build') {
             steps {
-                bat 'npm run build'
+                script {
+                    docker.image('node:18').inside {
+                        sh 'npm run build'
+                    }
+                }
             }
         }
         stage('Test') {
             steps {
-                bat 'npm test'
+                script {
+                    docker.image('node:18').inside {
+                        sh 'npm test'
+                    }
+                }
             }
         }
     }
