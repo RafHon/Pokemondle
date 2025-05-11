@@ -5,8 +5,8 @@ pipeline {
         stage('Install') {
             steps {
                 script {
-                    docker.image('node:18').inside {
-                        sh 'npm install'
+                    docker.image('node:18').inside('-v C:/ProgramData/Jenkins/.jenkins:/workspace') {
+                        bat 'npm install' // Użyj bat zamiast sh, jeżeli to Windows
                     }
                 }
             }
@@ -14,8 +14,8 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    docker.image('node:18').inside {
-                        sh 'npm run build'
+                    docker.image('node:18').inside('-v C:/ProgramData/Jenkins/.jenkins:/workspace') {
+                        bat 'npm run build'
                     }
                 }
             }
@@ -23,8 +23,8 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    docker.image('node:18').inside {
-                        sh 'npm test'
+                    docker.image('node:18').inside('-v C:/ProgramData/Jenkins/.jenkins:/workspace') {
+                        bat 'npm test'
                     }
                 }
             }
