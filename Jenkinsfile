@@ -1,25 +1,20 @@
 pipeline {
-    agent any
-
-    stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/RafHon/Pokemondle.git'
-            }
+    agent {
+        docker {
+            image 'node:18' // Linuxowy obraz z Node.js
         }
-
-        stage('Install Dependencies') {
+    }
+    stages {
+        stage('Install') {
             steps {
                 sh 'npm install'
             }
         }
-
         stage('Build') {
             steps {
                 sh 'npm run build'
             }
         }
-
         stage('Test') {
             steps {
                 sh 'npm test'
