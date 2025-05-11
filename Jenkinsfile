@@ -10,11 +10,17 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
+       stage('Build') {
+    steps {
+        script {
+            // Przechodzimy do folderu z pom.xml
+            dir('Pokemondle Backend') {
+                // Uruchomienie Maven z katalogu, gdzie znajduje się pom.xml
                 bat 'mvn clean install'
             }
         }
+    }
+}
 
         stage('Test') {
             steps {
