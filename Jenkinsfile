@@ -1,32 +1,24 @@
 pipeline {
     agent any
-
+    tools {
+        maven 'Maven_3.8.1'
+    }
     stages {
-        stage('Install') {
+        stage('Checkout') {
             steps {
-                script {
-                    docker.image('node:18').inside("-v /c/ProgramData/Jenkins/.jenkins:/jenkins_workspace -w /jenkins_workspace/workspace/SamplePipeline") {
-                        sh 'npm install'
-                    }
-                }
+                git 'https://github.com/RafHon/Pokemondle'
             }
         }
+
         stage('Build') {
             steps {
-                script {
-                    docker.image('node:18').inside("-v /c/ProgramData/Jenkins/.jenkins:/jenkins_workspace -w /jenkins_workspace/workspace/SamplePipeline") {
-                        sh 'npm run build'
-                    }
-                }
+                bat 'mvn clean install'
             }
         }
+
         stage('Test') {
             steps {
-                script {
-                    docker.image('node:18').inside("-v /c/ProgramData/Jenkins/.jenkins:/jenkins_workspace -w /jenkins_workspace/workspace/SamplePipeline") {
-                        sh 'npm test'
-                    }
-                }
+                bat 'mvn test'
             }
         }
     }
